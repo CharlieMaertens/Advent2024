@@ -18,11 +18,6 @@ func digit(a string) bool {
 
 }
 
-// func matchesPattern(token string, pattern string) bool {
-// 	parts := strings.Split(pattern, "$")
-// 	for _, part
-// }
-
 func main() {
 	filename := "input.txt"
 	if len(os.Args) > 1 {
@@ -31,13 +26,21 @@ func main() {
 	data, err := os.ReadFile(filename)
 	check(err)
 	sum := 0
-	for j := 0; j < len(data); j++ {
-		// c := string(data[j])
+	lenDo := len("do()")
+	lenDont := len("don't()")
+	do := true
+	l := len(data)
+	for j := 0; j < l; j++ {
 		var x string
 		var y string
-		l := len(data)
+
 		yOff := 0
-		if j+4 < l && string(data[j:j+4]) == "mul(" {
+
+		if j+lenDo < l && string(data[j:j+lenDo]) == "do()" {
+			do = true
+		} else if j+lenDont < l && string(data[j:j+lenDont]) == "don't()" {
+			do = false
+		} else if j+4 < l && string(data[j:j+4]) == "mul(" {
 			if j+5 < l && string(data[j+5]) == "," {
 				yOff = 6
 				x = string(data[j+4])
@@ -57,16 +60,15 @@ func main() {
 				y = string(data[j+yOff : j+yOff+3])
 			}
 
-			fmt.Print(x)
-			fmt.Print(" ")
-			fmt.Print(y)
-			fmt.Println()
 			if digit(x) && digit(y) {
 				xInt, err := strconv.Atoi(x)
 				check(err)
 				yInt, err := strconv.Atoi(y)
 				check(err)
-				sum += (xInt * yInt)
+				if do {
+					sum += (xInt * yInt)
+				}
+
 			}
 		}
 	}
