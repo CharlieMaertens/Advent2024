@@ -21,22 +21,6 @@ func middleValue(update []string) int {
 	return value
 }
 
-func fix(rules map[string][]string, update []string) []string {
-	for i := 0; i < len(update); i++ {
-		for j := 0; j < len(update); j++ {
-
-			if slices.Contains(rules[update[i]], update[j]) {
-				temp := update[i]
-				update[i] = update[j]
-				update[j] = temp
-			}
-		}
-
-	}
-
-	return update
-}
-
 func main() {
 	filename := "input.txt"
 	file, err := os.Open(filename)
@@ -44,7 +28,6 @@ func main() {
 	defer file.Close()
 
 	beforeMap := make(map[string][]string)
-	afterMap := make(map[string][]string)
 	scanner := bufio.NewScanner(file)
 
 	for scanner.Scan() && scanner.Text() != "" {
@@ -58,13 +41,6 @@ func main() {
 		}
 
 		beforeMap[after] = append(beforeMap[after], before)
-
-		_, in = afterMap[before]
-		if !in {
-			afterMap[before] = []string{}
-		}
-
-		afterMap[after] = append(afterMap[before], after)
 	}
 	part1 := 0
 	part2 := 0
@@ -80,8 +56,13 @@ func main() {
 		if correct {
 			part1 += middleValue(update)
 		} else {
-			betterUpdate := fix(beforeMap, update)
-			part2 += middleValue(betterUpdate)
+			slices.SortFunc(update, func(a string, b string) int {
+				if slices.Contains(beforeMap[a], b) {
+					return -1
+				}
+				return 1
+			})
+			part2 += middleValue(update)
 		}
 	}
 	fmt.Println(part1)
